@@ -1,0 +1,20 @@
+<testsuites>
+	<testsuite name="AllTests" tests="4">
+		<testcase classname="AllTests" name="factorialTest"/>
+		<testcase classname="AllTests" name="calcChangeTest">
+			<failure message="src/Test.cpp:37 calcChangeTest: &quot;4;4;&quot; == calcChange(8, numCoins3, coinValues3) expected:	4;4;	but was:	5;1;1;1;	">
+calcChangeTest: &quot;4;4;&quot; == calcChange(8, numCoins3, coinValues3) expected:	4;4;	but was:	5;1;1;1;	
+			</failure>
+		</testcase>
+		<testcase classname="AllTests" name="calcSumArrayTest">
+			<failure message="src/Test.cpp:47 calcSumArrayTest: &quot;1,4;9,1;11,2;18,1;22,0;&quot; == calcSum(sequence, 5) expected:	1,4;9,1;11,2;18,1;22,0;	but was:		">
+calcSumArrayTest: &quot;1,4;9,1;11,2;18,1;22,0;&quot; == calcSum(sequence, 5) expected:	1,4;9,1;11,2;18,1;22,0;	but was:		
+			</failure>
+		</testcase>
+		<testcase classname="AllTests" name="partitioningTest">
+			<failure message="src/Test.cpp:53 partitioningTest: 3025 == s_recursive(9,3) expected:	3025	but was:	1	">
+partitioningTest: 3025 == s_recursive(9,3) expected:	3025	but was:	1	
+			</failure>
+		</testcase>
+	</testsuite>
+</testsuites>
