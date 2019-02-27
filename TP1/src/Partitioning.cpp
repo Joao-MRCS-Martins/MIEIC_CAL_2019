@@ -7,18 +7,25 @@
 
 int s_recursive(int n,int k)
 {
-   return 1;
+	if (k == 1 || k == n)
+		return 1;
+	else
+		return s_recursive(n-1,k-1) + k* s_recursive(n-1,k);
 }
 
 int s_dynamic(int n,int k)
 {
-	return 1;
+
+
 }
 
 
 int b_recursive(int n)
 {
-	return 0;
+	int b =0;
+	for(int i=1; i <= n; i++)
+		b += s_recursive(n,i);
+	return b;
 }
 
 int b_dynamic(int n)
