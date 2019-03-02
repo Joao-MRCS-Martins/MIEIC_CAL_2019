@@ -15,8 +15,13 @@ int s_recursive(int n,int k)
 
 int s_dynamic(int n,int k)
 {
-
-
+    vector<int> values(k,1);
+    for(int i =0; i < (n-k); i++) {
+        for(int j =1; j < k; j++) {
+            values[j] = values[j-1] + (j+1)*values[j];
+        }
+    }
+    return values[k-1];
 }
 
 
@@ -30,7 +35,11 @@ int b_recursive(int n)
 
 int b_dynamic(int n)
 {
-	return 0;
+    int bell =0;
+    for(int i = 1; i <= n; i++) {
+        bell += s_dynamic(n, i);
+    }
+	return bell;
 }
 
 
