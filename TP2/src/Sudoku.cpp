@@ -94,35 +94,70 @@ bool Sudoku::isComplete()
  */
 bool Sudoku::solve()
 {
-	if(this->isComplete())
-		return true;
-
-	for(int j = 0; j < 9; j++) {
-		for (int k = 0; k < 9; k++) {
-			if(numbers[j][k]  != 0) break;
-			for (int i = 1; i <= 9; i++) {
-				if (!columnHasNumber[k][i] && !lineHasNumber[j][i] && !block3x3HasNumber[j / 3][k / 3][i]) {
-					numbers[j][k] = i;
-					columnHasNumber[k][i] = true;
-					lineHasNumber[j][i] = true;
-					block3x3HasNumber[j / 3][k / 3][i] = true;
-					countFilled++;
-					if(solve())
-						return true;
-					numbers[j][k] = 0;
-					columnHasNumber[k][i]=false;
-					lineHasNumber[j][i] = false;
-					block3x3HasNumber[j/3][k/3][i] = false;
-					countFilled--;
-				}
-			}
-		}
-	}
-	this->print();
-	return false;
+	return solve(0,0);
 }
 
 
+
+bool Sudoku::solve(int i, int j) {
+
+	if(isComplete() || i > 8 || j>8)
+		return true;
+
+	pair<int,int> sqr;
+
+	//verificar quando está preenchido
+	if(numbers[i][j] !=0) {
+		if(i ==8 && j ==8) {
+			return true;
+		}
+		//continuar para a proxima casa
+		sqr = nextSquare(i,j);
+		return solve(sqr.first,sqr.second);
+	}
+
+	//tentar preencher o quadrado com um numero 1..9
+	for(int n =1; n<=9;n++) {
+		//verificar as condicoes de jogo
+		if(block3x3HasNumber[i/3][j/3][n] || columnHasNumber[j][n] || lineHasNumber[i][n])
+			continue;
+		else {
+			//preencher o quadrado
+			fillSqr(i,j,n);
+
+			//continuar para a proxima casa
+			sqr = nextSquare(i,j);
+
+			//verificar se o puzzle se resolve com este numero nesta casa
+			if(solve(sqr.first,sqr.second))
+				return true;
+			//senao apagar o numero e tentar com outro
+			else {
+				unFillSqr(i,j,n);
+				continue;
+			}
+
+		}
+	}
+	return false;
+}
+
+void Sudoku::fillSqr(int i, int j, int n) {
+	numbers[i][j] = n;
+	block3x3HasNumber[i/3][j/3][n] = true;
+	columnHasNumber[j][n] = true;
+	lineHasNumber[i][n]=true;
+	countFilled++;
+}
+
+pair<int, int> Sudoku::nextSquare(int i, int j) {
+	if(i == 8) {
+		return make_pair(0,j+1);
+	}
+	else {
+		return make_pair(i+1,j);
+	}
+}
 
 /**
  * Imprime o Sudoku.
@@ -136,4 +171,12 @@ void Sudoku::print()
 
 		cout << endl;
 	}
+}
+
+void Sudoku::unFillSqr(int i, int j, int n) {
+	numbers[i][j] =0;
+	block3x3HasNumber[i/3][j/3][n] = false;
+	columnHasNumber[j][n] = false;
+	lineHasNumber[i][n]=false;
+	countFilled--;
 }

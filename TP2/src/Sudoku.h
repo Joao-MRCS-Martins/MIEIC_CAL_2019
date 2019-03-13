@@ -67,6 +67,13 @@ public:
 	 */
 	bool solve();
 
+    bool solve(int i,int j);
+
+    pair<int,int> nextSquare(int i,int j);
+
+    void fillSqr(int i,int j,int n);
+
+    void unFillSqr(int i,int j,int n);
 
 	/**
 	 * Imprime o Sudoku.
