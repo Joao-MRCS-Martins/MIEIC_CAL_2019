@@ -236,10 +236,29 @@ void Graph<T>::dfsVisit(Vertex<T> *v, vector<T> & res) const {
  */
 template <class T>
 vector<T> Graph<T>::bfs(const T & source) const {
-	// TODO (22 lines)
+
 	// HINT: Use the flag "visited" to mark newly discovered vertices .
 	// HINT: Use the "queue<>" class to temporarily store the vertices.
-	vector<T> res;
+    queue<Vertex<T>*> vert_queue;
+    vector<T> res;
+
+    for( Vertex<T>* vertices : this->vertexSet) {
+        vertices->visited = false;
+    }
+    vert_queue.push(*this->vertexSet.begin());
+
+    while(!vert_queue.empty()) {
+        Vertex<T>* next = vert_queue.front();
+        next->visited = true;
+        vert_queue.pop();
+        res.push_back(next->info);
+        for(Edge<T> edge: next->adj) {
+            if(!edge.dest->visited) {
+                vert_queue.push(edge.dest);
+            }
+        }
+    }
+
 	return res;
 }
 
@@ -254,8 +273,38 @@ vector<T> Graph<T>::bfs(const T & source) const {
 
 template<class T>
 vector<T> Graph<T>::topsort() const {
-	// TODO (26 lines)
 	vector<T> res;
+
+	for(Vertex<T>* vertex: this->vertexSet) {
+	    vertex->visited = false;
+	    vertex->indegree = 0;
+	}
+
+    for(Vertex<T>* vertex :this->vertexSet) {
+        for(Edge<T> edge : vertex->adj) {
+            edge.dest->indegree++;
+        }
+    }
+
+    queue<Vertex<T>*> vert_queue;
+
+    for(Vertex<T>* vertex : this->vertexSet) {
+	    if(vertex->indegree == 0)
+	        vert_queue.push(vertex);
+	}
+
+	while(!vert_queue.empty()) {
+	    Vertex<T>* next = vert_queue.front();
+	    next->visited = true;
+	    vert_queue.pop();
+	    res.push_back(next->info);
+	    for(Edge<T> edge : next->adj) {
+	        edge.dest->indegree--;
+            if (edge.dest->indegree == 0) {
+                vert_queue.push(edge.dest);
+            }
+        }
+	}
 	return res;
 }
 
