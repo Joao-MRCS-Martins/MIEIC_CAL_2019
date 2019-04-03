@@ -32,7 +32,7 @@ class Vertex {
 	int queueIndex = 0; 		// required by MutablePriorityQueue
 
 	bool processing = false;
-	void addEdge(Vertex<T> *dest, double w);
+	Edge<T> addEdge(Vertex<T> *orig,Vertex<T> *dest, double w);
 
 public:
 	Vertex(T in);
@@ -53,8 +53,9 @@ Vertex<T>::Vertex(T in): info(in) {}
  * with a given destination vertex (d) and edge weight (w).
  */
 template <class T>
-void Vertex<T>::addEdge(Vertex<T> *d, double w) {
-	adj.push_back(Edge<T>(d, w));
+Edge<T> Vertex<T>::addEdge(Vertex<T> *o,Vertex<T> *d, double w) {
+	adj.push_back(Edge<T>(o,d, w));
+	return Edge<T>(o,d,w);
 }
 
 template <class T>
@@ -80,17 +81,18 @@ Vertex<T> *Vertex<T>::getPath() const {
 /********************** Edge  ****************************/
 
 template <class T>
-class Edge {
+class   Edge {
+    Vertex<T>* orig;
 	Vertex<T> * dest;      // destination vertex
 	double weight;         // edge weight
 public:
-	Edge(Vertex<T> *d, double w);
+	Edge(Vertex<T> *o, Vertex<T> *d, double w);
 	friend class Graph<T>;
 	friend class Vertex<T>;
 };
 
 template <class T>
-Edge<T>::Edge(Vertex<T> *d, double w): dest(d), weight(w) {}
+Edge<T>::Edge(Vertex<T> *o,Vertex<T> *d, double w): orig(o), dest(d), weight(w) {}
 
 
 /*************************** Graph  **************************/
@@ -98,6 +100,7 @@ Edge<T>::Edge(Vertex<T> *d, double w): dest(d), weight(w) {}
 template <class T>
 class Graph {
 	vector<Vertex<T> *> vertexSet;    // vertex set
+	vector<Edge<T>> edgeSet;
 
 public:
 	Vertex<T> *findVertex(const T &in) const;
@@ -163,7 +166,7 @@ bool Graph<T>::addEdge(const T &sourc, const T &dest, double w) {
 	auto v2 = findVertex(dest);
 	if (v1 == NULL || v2 == NULL)
 		return false;
-	v1->addEdge(v2,w);
+	edgeSet.push_back(v1->addEdge(v1,v2,w));
 	return true;
 }
 
@@ -203,18 +206,64 @@ void Graph<T>::dijkstraShortestPath(const T &origin) {
 template<class T>
 vector<T> Graph<T>::getPath(const T &origin, const T &dest) const{
 	vector<T> res;
-	// TODO
+	res.push_back(dest);
+	Vertex<T>* next = findVertex(dest);
+	while((next = next->getPath()) != NULL) {
+	    if(next->getInfo() == origin) {
+	        res.push_back(origin);
+	        break;
+	    }
+	    res.push_back(next->getInfo());
+	}
+	reverse(res.begin(),res.end());
 	return res;
 }
 
 template<class T>
 void Graph<T>::unweightedShortestPath(const T &orig) {
-	// TODO
+	for(Vertex<T>* vertex: this->vertexSet) {
+	    vertex->dist = INF;
+	    vertex->path = NULL;
+	}
+    Vertex<T>* vert = findVertex(orig);
+	vert->dist = 0;
+	queue<Vertex<T>*> queue;
+	queue.push(vert);
+	while(!queue.empty()) {
+	    Vertex<T>* next = queue.front();
+	    queue.pop();
+	    for(Edge<T> edge : next->adj) {
+	        if(edge.dest->dist == INF) {
+	            queue.push(edge.dest);
+	            edge.dest->dist = next->dist +1;
+	            edge.dest->path = next;
+	        }
+	    }
+	}
 }
 
 template<class T>
 void Graph<T>::bellmanFordShortestPath(const T &orig) {
-	// TODO
+    for(Vertex<T>* vertex: this->vertexSet) {
+        vertex->dist = INF;
+        vertex->path = NULL;
+    }
+    Vertex<T>* vert = findVertex(orig);
+    vert->dist = 0;
+    for(int i = 1; i < this->vertexSet.size(); i++) {
+        for(Edge<T> edge : this->edgeSet) {
+            if(edge.dest->dist > edge.orig->dist + edge.weight) {
+                edge.dest->dist = edge.orig->dist + edge.weight;
+                edge.dest->path = edge.orig;
+            }
+        }
+    }
+    for(Edge<T> edge : this->edgeSet) {
+        if(edge.orig->dist + edge.weight < edge.dest->dist) {
+            cerr << "there cycles of negative weight";
+            return;
+        }
+    }
 }
 
 
